@@ -12,6 +12,7 @@ let createUserData = async function (userData, userId) {
 
   const newUserData = new User({
     userId: userId,
+    profile: userData.profile,
     searches: userData.searches,
     readLater: userData.readLater,
     likes: userData.likes,
