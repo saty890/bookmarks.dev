@@ -1,4 +1,5 @@
 // update user display name for bookmarks - displayName should be set in user profile
+// execute PUT /api/admin/users/display-name (execute twice to see if anything is still open)
 db.users.find().forEach(
   function (user) {
     // print('\nuser ' + user._id);
