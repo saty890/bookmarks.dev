@@ -79,6 +79,24 @@ paths:
           description: OK
           $ref: '#/components/responses/BookmarkListResponse'
 
+  /public/users/{userId}/top-public-tags:
+    get:
+      summary: returns top public tags for the used
+      tags:
+        - public-user-data
+      parameters:
+        - $ref: "#/components/parameters/userIdPathParam"
+        - $ref: "#/components/parameters/limitQueryParam"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagCount'
+
   /webpage-info/scrape:
     get:
       description: Returns web page info about the page scraped by `location`, `youtubeVideoId` or `stackoverflowQuestionId`
@@ -686,6 +704,17 @@ components:
           items:
             type: string
 
+    TagCount:
+      type: object
+      required:
+        - name
+        - count
+      properties:
+        name:
+          type: string
+        count:
+          type: integer
+          description: how much many times the tag has been used in the specific context
     BasicErrorModel:
       type: object
       required:
