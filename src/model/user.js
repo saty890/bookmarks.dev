@@ -18,7 +18,8 @@ const profileSchema = new Schema({
   summary: String,
   websiteLink: String,
   twitterLink: String,
-  githubLink: String
+  githubLink: String,
+  linkedinLink: String
 });
 
 const userSchema = new Schema({

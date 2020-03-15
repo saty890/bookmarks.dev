@@ -79,9 +79,9 @@ paths:
           description: OK
           $ref: '#/components/responses/BookmarkListResponse'
 
-  /public/users/{userId}/top-public-tags:
+  /public/users/{userId}/profile:
     get:
-      summary: returns top public tags for the used
+      summary: returns public profile data (user profile & top public tags ) for user
       tags:
         - public-user-data
       parameters:
@@ -93,9 +93,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TagCount'
+                type: object
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/UserProfile'
+                  topUsedPublicTags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TagCount'
+
 
   /webpage-info/scrape:
     get:
@@ -656,6 +662,20 @@ components:
         stackoverflowQuestionId:
           type: string
 
+    UserProfile:
+      properties:
+        displayName:
+          type: string
+        summary:
+          type: string
+        websiteLink:
+          type: string
+        twitterLink:
+          type: string
+        githubLink:
+          type: string
+        linkedinLink:
+          type: string
     Search:
       required:
         - text
@@ -679,10 +699,12 @@ components:
       properties:
         userId:
           type: string
+        profile:
+          $ref: '#/components/schemas/Search'
         searches:
           type: array
           items:
-            $ref: '#/components/schemas/Search'
+            $ref: '#/components/schemas/UserProfile'
         readLater:
           type: array
           items:
