@@ -2,6 +2,7 @@ const Bookmark = require('../../model/bookmark');
 const User = require('../../model/user');
 const NotFoundError = require('../../error/not-found.error');
 const ValidationError = require('../../error/validation.error');
+const crypto = require('crypto');
 
 const BookmarkInputValidator = require('../../common/bookmark-input.validator');
 
@@ -193,6 +194,40 @@ let updateDisplayNameForUsers = async (keycloakUsers) => {
   return response;
 }
 
+/**
+ * Updates displayName in User documents with the first name from Keycloak if not set already
+ *
+ * @param keycloakUsers
+ * @returns {Promise<Array>}
+ */
+let setProfileImageUrlForUsersWithGravatar = async (keycloakUsers) => {
+  let response = [];
+  for ( let keycloakUser of keycloakUsers ) {
+    const emailMd5Hash = crypto.createHash('md5').update(keycloakUser.email).digest('hex');
+    const imageUrl = `https://gravatar.com/avatar/${emailMd5Hash}?s=340`;
+    const updatedUser = await User.findOneAndUpdate(
+      {
+        $and: [
+          {userId: keycloakUser.id},
+          //{ "profile.imageUrl": { "$exists": false } },
+        ]
+      },
+      {"$set": {"profile.imageUrl": imageUrl}},
+      {new: true}
+    );
+
+    if(updatedUser) {
+      response.push({
+        userId: updatedUser.userId,
+        email: keycloakUser.email,
+        imageUrl: updatedUser.profile.imageUrl
+      });
+    }
+  }
+
+  return response;
+}
+
 /*
 * DELETE user by userId
 */
@@ -221,5 +256,6 @@ module.exports = {
   deleteUserByUserId: deleteUserByUserId,
   deleteBookmarksByLocation: deleteBookmarksByLocation,
   deleteBookmarksByUserId: deleteBookmarksByUserId,
-  updateDisplayNameForUsers: updateDisplayNameForUsers
+  updateDisplayNameForUsers: updateDisplayNameForUsers,
+  setProfileImageUrlForUsersWithGravatar: setProfileImageUrlForUsersWithGravatar
 };

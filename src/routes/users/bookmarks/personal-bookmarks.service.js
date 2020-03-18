@@ -210,6 +210,16 @@ let deletePrivateBookmarksByTag = async (userId, tag) => {
   return true;
 };
 
+/*
+* Update displayName in all bookmarks of user
+*/
+let updateDisplayNameInBookmarks = async (userId, displayName) => {
+
+  await Bookmark.updateMany({userId: userId}, {$set: {userDisplayName: displayName}});
+
+  return true;
+};
+
 module.exports = {
   createBookmark: createBookmark,
   getSuggestedTagsForUser: getSuggestedTagsForUser,
@@ -224,5 +234,6 @@ module.exports = {
   deleteBookmarkById: deleteBookmarkById,
   deleteBookmarkByLocation: deleteBookmarkByLocation,
   deletePrivateBookmarksByTag: deletePrivateBookmarksByTag,
-  getUserTags: getUserTags
+  getUserTags: getUserTags,
+  updateDisplayNameInBookmarks: updateDisplayNameInBookmarks
 };

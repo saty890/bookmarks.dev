@@ -135,8 +135,11 @@ adminRouter.delete('/bookmarks', keycloak.protect('realm:ROLE_ADMIN'), async (re
     .send({message: 'You can either delete bookmarks by location or userId - at least one of them mandatory'});
 });
 
-//updates user display name
-adminRouter.put('/users/display-name', keycloak.protect('realm:KEYCLOAK_REALM_ADMIN'), async (request, response) => {
+/*
+  updates user display name
+  This should be used only one time.
+ */
+adminRouter.put('/users/profile/display-name', keycloak.protect('realm:KEYCLOAK_REALM_ADMIN'), async (request, response) => {
   const responseUsers = await superagent.get(`${process.env.KEYCLOAK_SERVER_URL}/admin/realms/${process.env.KEYCLOAK_REALM}/users`)
     .set('Authorization', request.headers.authorization)
     .query({briefRepresentation: true})
@@ -145,6 +148,24 @@ adminRouter.put('/users/display-name', keycloak.protect('realm:KEYCLOAK_REALM_AD
 
   const keycloakUsers = responseUsers.body;
   const updatedUsers = await AdminService.updateDisplayNameForUsers(keycloakUsers);
+
+  return response.status(HttpStatus.OK).send(updatedUsers);
+});
+
+/**
+ * Updates user profile image url with gravatar image if present
+ *
+ */
+
+adminRouter.put('/users/profile/image-url', keycloak.protect('realm:KEYCLOAK_REALM_ADMIN'), async (request, response) => {
+  const responseUsers = await superagent.get(`${process.env.KEYCLOAK_SERVER_URL}/admin/realms/${process.env.KEYCLOAK_REALM}/users`)
+    .set('Authorization', request.headers.authorization)
+    .query({briefRepresentation: true})
+    .query({first: 0})
+    .query({max: 500});
+
+  const keycloakUsers = responseUsers.body;
+  const updatedUsers = await AdminService.setProfileImageUrlForUsersWithGravatar(keycloakUsers);
 
   return response.status(HttpStatus.OK).send(updatedUsers);
 });
