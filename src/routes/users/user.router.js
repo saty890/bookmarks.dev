@@ -4,6 +4,7 @@ const personalBookmarksRouter = require('./bookmarks/personal-bookmarks.router')
 
 const Keycloak = require('keycloak-connect');
 
+
 const UserDataService = require('./user-data.service');
 const userIdTokenValidator = require('./userid.validator');
 const PaginationQueryParamsHelper = require('../../common/pagination-query-params-helper');
@@ -17,6 +18,26 @@ const HttpStatus = require('http-status-codes/index');
 const keycloak = new Keycloak({scope: 'openid'}, config.keycloak);
 usersRouter.use(keycloak.middleware());
 
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix)
+  }
+})
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1000000
+  }
+  // you might also want to set some limits: https://github.com/expressjs/multer#limits
+});
+
 usersRouter.use('/:userId/bookmarks', personalBookmarksRouter);
 
 /* GET personal bookmarks of the users */
@@ -25,6 +46,15 @@ usersRouter.get('/:userId', keycloak.protect(), async (request, response) => {
   const userData = await UserDataService.getUserData(request.params.userId);
   return response.status(HttpStatus.OK).json(userData);
 });
+
+/* save profile picture */
+usersRouter.post('/:userId/profile-picture', keycloak.protect(),
+  upload.single("image" /* name attribute of <file> element in your form */),
+  async (request, response) => {
+    userIdTokenValidator.validateUserId(request);
+
+    return response.status(HttpStatus.OK).send();
+  });
 
 /* GET list of bookmarks to be read later for the user */
 usersRouter.get('/:userId/read-later', keycloak.protect(), async (request, response) => {

@@ -14,6 +14,7 @@ const searchSchema = new Schema({
 
 const profileSchema = new Schema({
   _id: {type:Schema.Types.ObjectId, select: false},
+  imageUrl: String,
   displayName: String,
   summary: String,
   websiteLink: String,

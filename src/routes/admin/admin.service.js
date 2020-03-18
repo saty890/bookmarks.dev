@@ -193,6 +193,22 @@ let updateDisplayNameForUsers = async (keycloakUsers) => {
   return response;
 }
 
+/*
+* DELETE user by userId
+*/
+let deleteUserByUserId = async (userId) => {
+  const user = await User.findOneAndRemove({
+    userId: userId
+  });
+
+  if ( !user ) {
+    throw new NotFoundError(`User NOT_FOUND with userId: ${userId}`);
+  } else {
+    return true;
+  }
+};
+
+
 module.exports = {
   getBookmarksWithFilter: getBookmarksWithFilter,
   getTagsOrderByNumberDesc: getTagsOrderByNumberDesc,
@@ -202,6 +218,7 @@ module.exports = {
   createBookmark: createBookmark,
   updateBookmark: updateBookmark,
   deleteBookmarkById: deleteBookmarkById,
+  deleteUserByUserId: deleteUserByUserId,
   deleteBookmarksByLocation: deleteBookmarksByLocation,
   deleteBookmarksByUserId: deleteBookmarksByUserId,
   updateDisplayNameForUsers: updateDisplayNameForUsers

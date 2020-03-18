@@ -136,8 +136,8 @@ adminRouter.delete('/bookmarks', keycloak.protect('realm:ROLE_ADMIN'), async (re
 });
 
 //updates user display name
-adminRouter.put('/users/display-name', keycloak.protect('realm:ROLE_ADMIN'), async (request, response) => {
-  const responseUsers = await superagent.get('http://localhost:8480/auth/admin/realms/bookmarks/users')
+adminRouter.put('/users/display-name', keycloak.protect('realm:KEYCLOAK_REALM_ADMIN'), async (request, response) => {
+  const responseUsers = await superagent.get(`${process.env.KEYCLOAK_SERVER_URL}/admin/realms/${process.env.KEYCLOAK_REALM}/users`)
     .set('Authorization', request.headers.authorization)
     .query({briefRepresentation: true})
     .query({first: 0})
@@ -147,6 +147,20 @@ adminRouter.put('/users/display-name', keycloak.protect('realm:ROLE_ADMIN'), asy
   const updatedUsers = await AdminService.updateDisplayNameForUsers(keycloakUsers);
 
   return response.status(HttpStatus.OK).send(updatedUsers);
+});
+
+//deletes user from keycloak and mongo
+adminRouter.delete('/users/:userId', keycloak.protect('realm:KEYCLOAK_REALM_ADMIN'), async (request, response) => {
+  const userId = request.params.userId;
+  const userDeletedResponse = await superagent.delete(`${process.env.KEYCLOAK_SERVER_URL}/admin/realms/${process.env.KEYCLOAK_REALM}/users/${userId}`)
+    .set('Authorization', request.headers.authorization);
+
+  if(userDeletedResponse.ok) {
+    await AdminService.deleteUserByUserId(userId);
+    await AdminService.deleteBookmarksByUserId(userId);
+
+    return response.status(HttpStatus.NO_CONTENT).send();
+  }
 });
 
 module.exports = adminRouter;
