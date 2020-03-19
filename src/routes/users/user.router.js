@@ -1,5 +1,6 @@
 const express = require('express');
 const usersRouter = express.Router();
+
 const personalBookmarksRouter = require('./bookmarks/personal-bookmarks.router');
 
 const Keycloak = require('keycloak-connect');
@@ -18,24 +19,33 @@ const HttpStatus = require('http-status-codes/index');
 const keycloak = new Keycloak({scope: 'openid'}, config.keycloak);
 usersRouter.use(keycloak.middleware());
 
-const multer = require("multer");
+const aws = require('aws-sdk');
+aws.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+});
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix)
-  }
-})
+const s3 = new aws.S3();
+const multer = require("multer");
+const multerS3 = require('multer-s3');
+const path = require('path')
 
 const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1000000
-  }
-  // you might also want to set some limits: https://github.com/expressjs/multer#limits
+  storage: multerS3({
+    s3: s3,
+    bucket: 'bookmarks.dev',
+    acl: 'public-read',
+    cacheControl: 'max-age=31536000',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    metadata: function (req, file, cb) {
+      cb(null, {fieldName: file.fieldname});
+    },
+    key: function (req, file, cb) {
+      const key = `user-profile-images/${process.env.NODE_ENV}/${req.params.userId}_${Date.now().toString()}${path.extname(file.originalname)}`
+      cb(null, key);
+    }
+  })
 });
 
 usersRouter.use('/:userId/bookmarks', personalBookmarksRouter);
@@ -53,7 +63,9 @@ usersRouter.post('/:userId/profile-picture', keycloak.protect(),
   async (request, response) => {
     userIdTokenValidator.validateUserId(request);
 
-    return response.status(HttpStatus.OK).send();
+    return response.status(HttpStatus.OK).send({
+      url: request.file.location
+    });
   });
 
 /* GET list of bookmarks to be read later for the user */

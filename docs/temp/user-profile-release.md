@@ -18,3 +18,6 @@ Get Access Token and Call admin api
 ```
 PUT https://www.bookmarks.dev/api/admin/users/profile/image-url
 ```
+
+### set AWS env variables in pm2 for prod
+
