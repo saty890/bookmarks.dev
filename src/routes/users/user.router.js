@@ -176,4 +176,21 @@ usersRouter.patch('/:userId/bookmarks/likes/:bookmarkId', keycloak.protect(), as
   return response.status(HttpStatus.OK).send(bookmark);
 });
 
+usersRouter.patch('/:userId/following/users/:followedUserId', async  (request, response)=> {
+  userIdTokenValidator.validateUserId(request);
+  const {userId, followedUserId} = request.params;
+  const updatedUserData = await UserDataService.followUser(userId, followedUserId);
+
+  return response.status(HttpStatus.OK).send(updatedUserData);
+});
+
+usersRouter.patch('/:userId/unfollowing/users/:followedUserId', async  (request, response)=> {
+  userIdTokenValidator.validateUserId(request);
+  const {userId, followedUserId} = request.params;
+  const updatedUserData = await UserDataService.unfollowUser(userId, followedUserId);
+
+  return response.status(HttpStatus.OK).send(updatedUserData);
+});
+
+
 module.exports = usersRouter;

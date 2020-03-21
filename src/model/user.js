@@ -23,6 +23,12 @@ const profileSchema = new Schema({
   linkedinLink: String
 });
 
+const followingSchema = new Schema({
+  _id: {type:Schema.Types.ObjectId, select: false},
+  users: [String],
+  tags: [String]
+});
+
 const userSchema = new Schema({
     userId: String, //global userId in the bookmarks context (currently is the Keycloak Id)
     profile: profileSchema,
@@ -33,6 +39,8 @@ const userSchema = new Schema({
     pinned: [String],
     favorites: [String],
     history: [String],
+    following: followingSchema,
+    followers: {type: [String], select: false},
     __v: {type: Number, select: false}
   },
   {

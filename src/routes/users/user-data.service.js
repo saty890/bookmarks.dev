@@ -85,7 +85,7 @@ function userSearchesAreValid(userData) {
 let getUserData = async function (userId) {
   const userData = await User.findOne({
     userId: userId
-  });
+  }).select("+followers");
 
   if ( !userData ) {
     throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
@@ -114,7 +114,7 @@ let getReadLater = async function (userId, page, limit) {
   if ( !userData ) {
     throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
   } else {
-    const readLaterRangeIds = userData.readLater.slice((page - 1) * limit, (page - 1) * limit + limit );
+    const readLaterRangeIds = userData.readLater.slice((page - 1) * limit, (page - 1) * limit + limit);
     const bookmarks = await Bookmark.find({"_id": {$in: readLaterRangeIds}});
 
     return bookmarks;
@@ -250,10 +250,10 @@ let getPinnedBookmarks = async function (userId, page, limit) {
   if ( !userData ) {
     throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
   } else {
-    const pinnedRangeIds = userData.pinned.slice((page - 1) * limit, (page - 1) * limit + limit );
+    const pinnedRangeIds = userData.pinned.slice((page - 1) * limit, (page - 1) * limit + limit);
     const bookmarks = await Bookmark.find({"_id": {$in: pinnedRangeIds}});
     //we need to order the bookmarks to correspond the one in the userData.pinned array
-    const orderedBookmarksAsInPinned = bookmarks.sort(function(a, b){
+    const orderedBookmarksAsInPinned = bookmarks.sort(function (a, b) {
       return pinnedRangeIds.indexOf(a._id) - pinnedRangeIds.indexOf(b._id);
     });
 
@@ -268,10 +268,10 @@ let getFavoriteBookmarks = async function (userId, page, limit) {
   if ( !userData ) {
     throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
   } else {
-    const favoritesRangeIds = userData.favorites.slice((page - 1) * limit, (page - 1) * limit + limit );
+    const favoritesRangeIds = userData.favorites.slice((page - 1) * limit, (page - 1) * limit + limit);
     const bookmarks = await Bookmark.find({"_id": {$in: favoritesRangeIds}});
     //we need to order the bookmarks to correspond the one in the userData.favorites array
-    const orderedBookmarksAsInFavorites = bookmarks.sort(function(a, b){
+    const orderedBookmarksAsInFavorites = bookmarks.sort(function (a, b) {
       return favoritesRangeIds.indexOf(a._id) - favoritesRangeIds.indexOf(b._id);
     });
 
@@ -287,11 +287,11 @@ let getBookmarksFromHistory = async function (userId, page, limit) {
   if ( !userData ) {
     throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
   } else {
-    const historyRangeIds = userData.history.slice((page - 1) * limit, (page - 1) * limit + limit );
+    const historyRangeIds = userData.history.slice((page - 1) * limit, (page - 1) * limit + limit);
     const bookmarks = await Bookmark.find({"_id": {$in: historyRangeIds}});
 
     //we need to order the bookmarks to correspond the one in the userData.history array
-    const orderedBookmarksAsInHistory = bookmarks.sort(function(a, b){
+    const orderedBookmarksAsInHistory = bookmarks.sort(function (a, b) {
       return historyRangeIds.indexOf(a._id) - historyRangeIds.indexOf(b._id);
     });
 
@@ -377,6 +377,36 @@ let unlikeBookmark = async function (userData, userId, bookmarkId) {
   }
 }
 
+let followUser = async function (userId, followedUserId) {
+  const updatedUserData = await User.findOneAndUpdate(
+    {userId: userId},
+    {$push: {'following.users': followedUserId}},
+    {new: true}
+  );
+
+  await User.findOneAndUpdate(
+    {userId: followedUserId},
+    {$push: {followers: userId}}
+  );
+
+  return updatedUserData;
+}
+
+let unfollowUser = async function (userId, followedUserId) {
+  const updatedUserData = await User.findOneAndUpdate(
+    {userId: userId},
+    {$pull: {'following.users': followedUserId}},
+    {new: true}
+  );
+
+  await User.findOneAndUpdate(
+    {userId: followedUserId},
+    {$pull: {followers: userId}}
+  );
+
+  return updatedUserData;
+}
+
 module.exports = {
   updateUserData: updateUserData,
   createUserData: createUserData,
@@ -390,5 +420,7 @@ module.exports = {
   getPinnedBookmarks: getPinnedBookmarks,
   getFavoriteBookmarks: getFavoriteBookmarks,
   getBookmarksFromHistory: getBookmarksFromHistory,
-  rateBookmark: rateBookmark
+  rateBookmark: rateBookmark,
+  followUser: followUser,
+  unfollowUser: unfollowUser
 }

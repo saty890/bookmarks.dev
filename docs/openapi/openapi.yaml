@@ -102,7 +102,6 @@ paths:
                     items:
                       $ref: '#/components/schemas/TagCount'
 
-
   /webpage-info/scrape:
     get:
       description: Returns web page info about the page scraped by `location`, `youtubeVideoId` or `stackoverflowQuestionId`
@@ -608,6 +607,41 @@ paths:
         403:
           $ref: '#/components/responses/ForbiddenError'
 
+  /personal/users/{userId}/following/users/{followedUserId}:
+    description: Adds `followedUserId` to the `following` list of `userId`, and `userId` to `followers` list of `followedUserId`
+    patch:
+      operationId: add-user-to-following
+      tags:
+        - user-data
+      parameters:
+        - $ref: '#/components/parameters/userIdPathParam'
+        - $ref: '#/components/parameters/followedUserIdPathParam'
+      responses:
+        200:
+          description: OK
+          $ref: '#/components/responses/UserDataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        403:
+          $ref: '#/components/responses/ForbiddenError'
+  /personal/users/{userId}/unfollowing/users/{followedUserId}:
+    description: Removes `followedUserId` from the `following` list of `userId`, and `userId` from the `followers` list of `followedUserId`
+    patch:
+      operationId: remove-user-from-following
+      tags:
+        - user-data
+      parameters:
+        - $ref: '#/components/parameters/userIdPathParam'
+        - $ref: '#/components/parameters/followedUserIdPathParam'
+      responses:
+        200:
+          description: OK
+          $ref: '#/components/responses/UserDataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        403:
+          $ref: '#/components/responses/ForbiddenError'
+
 components:
   schemas:
     Bookmark:
@@ -693,6 +727,16 @@ components:
             - personal
         count:
           type: integer
+    Following:
+      properties:
+        users:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
     User:
       required:
         - userId
@@ -700,11 +744,11 @@ components:
         userId:
           type: string
         profile:
-          $ref: '#/components/schemas/Search'
+          $ref: '#/components/schemas/UserProfile'
         searches:
           type: array
           items:
-            $ref: '#/components/schemas/UserProfile'
+            $ref: '#/components/schemas/Search'
         readLater:
           type: array
           items:
@@ -725,6 +769,12 @@ components:
           type: array
           items:
             type: string
+        followers:
+          type: array
+          items:
+            type: string
+        following:
+          $ref: '#/components/schemas/Following'
 
     TagCount:
       type: object
@@ -803,6 +853,13 @@ components:
       schema:
         type: string
         default: 4c617f2b-2bad-498b-a9c6-4e9a8c303798
+    followedUserIdPathParam:
+      name: followedUserId
+      in: path
+      description: the id of the user to be following
+      required: true
+      schema:
+        type: string
     bookmarkIdPathParam:
       name: bookmarkId
       in: path
@@ -875,6 +932,12 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Bookmark'
+    UserDataResponse:
+      description: User data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
     ForbiddenError:
       description: Access token is missing or invalid
     UnauthorizedError:

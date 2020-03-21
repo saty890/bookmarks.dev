@@ -18,12 +18,13 @@ router.get('/:userId/profile', async (request, response) => {
 
   const userData = await UserDataService.getUserData(userId);
   const userPublicData = {
+    userId: userData.userId,
     topUsedPublicTags: topUsedPublicTags,
-    publicProfile: userData.profile
+    publicProfile: userData.profile,
+    followers: userData.followers
   }
 
   return response.status(HttpStatus.OK).json(userPublicData);
 });
-
 
 module.exports = router;
