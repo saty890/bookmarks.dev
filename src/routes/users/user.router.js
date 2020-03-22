@@ -50,10 +50,10 @@ const upload = multer({
 
 usersRouter.use('/:userId/bookmarks', personalBookmarksRouter);
 
-/* GET personal bookmarks of the users */
 usersRouter.get('/:userId', keycloak.protect(), async (request, response) => {
   userIdTokenValidator.validateUserId(request);
   const userData = await UserDataService.getUserData(request.params.userId);
+
   return response.status(HttpStatus.OK).json(userData);
 });
 
@@ -176,7 +176,7 @@ usersRouter.patch('/:userId/bookmarks/likes/:bookmarkId', keycloak.protect(), as
   return response.status(HttpStatus.OK).send(bookmark);
 });
 
-usersRouter.patch('/:userId/following/users/:followedUserId', async  (request, response)=> {
+usersRouter.patch('/:userId/following/users/:followedUserId', keycloak.protect(), async  (request, response) => {
   userIdTokenValidator.validateUserId(request);
   const {userId, followedUserId} = request.params;
   const updatedUserData = await UserDataService.followUser(userId, followedUserId);
@@ -184,7 +184,7 @@ usersRouter.patch('/:userId/following/users/:followedUserId', async  (request, r
   return response.status(HttpStatus.OK).send(updatedUserData);
 });
 
-usersRouter.patch('/:userId/unfollowing/users/:followedUserId', async  (request, response)=> {
+usersRouter.patch('/:userId/unfollowing/users/:followedUserId', keycloak.protect(), async  (request, response) => {
   userIdTokenValidator.validateUserId(request);
   const {userId, followedUserId} = request.params;
   const updatedUserData = await UserDataService.unfollowUser(userId, followedUserId);
@@ -192,5 +192,18 @@ usersRouter.patch('/:userId/unfollowing/users/:followedUserId', async  (request,
   return response.status(HttpStatus.OK).send(updatedUserData);
 });
 
+usersRouter.get('/:userId/following/users', keycloak.protect(), async  (request, response) => {
+  userIdTokenValidator.validateUserId(request);
+  const followedUsersData = await UserDataService.getFollowedUsersData(request.params.userId);
+
+  return response.status(HttpStatus.OK).send(followedUsersData);
+});
+
+usersRouter.get('/:userId/followers', keycloak.protect(), async  (request, response) => {
+  userIdTokenValidator.validateUserId(request);
+  const followers = await UserDataService.getFollowers(request.params.userId);
+
+  return response.status(HttpStatus.OK).send(followers);
+});
 
 module.exports = usersRouter;

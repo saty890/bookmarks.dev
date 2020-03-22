@@ -407,6 +407,37 @@ let unfollowUser = async function (userId, followedUserId) {
   return updatedUserData;
 }
 
+let getFollowedUsersData = async function (userId) {
+  const userData = await User.findOne({
+    userId: userId
+  });
+
+  if ( !userData ) {
+    throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
+  } else {
+    const followedUsers = await User.find(
+      {userId: {$in: userData.following.users}}
+    ).select('userId profile');
+
+    return followedUsers;
+  }
+}
+let getFollowers = async function (userId) {
+  const userData = await User.findOne({
+    userId: userId
+  }).select("+followers");
+
+  if ( !userData ) {
+    throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
+  } else {
+    const followers = await User.find(
+      {userId: {$in: userData.followers}}
+    ).select('userId profile');
+
+    return followers;
+  }
+}
+
 module.exports = {
   updateUserData: updateUserData,
   createUserData: createUserData,
@@ -422,5 +453,7 @@ module.exports = {
   getBookmarksFromHistory: getBookmarksFromHistory,
   rateBookmark: rateBookmark,
   followUser: followUser,
-  unfollowUser: unfollowUser
+  unfollowUser: unfollowUser,
+  getFollowedUsersData: getFollowedUsersData,
+  getFollowers: getFollowers
 }

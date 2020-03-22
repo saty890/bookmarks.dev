@@ -470,7 +470,7 @@ describe('Personal Bookmarks tests', function () {
           .send(bookmarkExample);
 
         if ( response.statusCode !== HttpStatus.CREATED ) {
-          throw new Error("Sample bookmark not properly created");
+          throw new Error("Sample personal bookmark not properly created");
         }
         const locationHeaderValue = response.header['location']
 
@@ -490,7 +490,7 @@ describe('Personal Bookmarks tests', function () {
         watchedTags: [],
         pinned: [],
         favorites: [],
-        history: []
+        history: [],
       }
 
       const createUserDataResponse = await request(app)
@@ -499,7 +499,7 @@ describe('Personal Bookmarks tests', function () {
         .send(userData);
 
       if ( createUserDataResponse.statusCode !== HttpStatus.CREATED ) {
-        throw new Error("Sample bookmark not properly created");
+        throw new Error("Sample personal bookmark not properly created");
       }
 
     });

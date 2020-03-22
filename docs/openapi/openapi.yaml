@@ -607,12 +607,50 @@ paths:
         403:
           $ref: '#/components/responses/ForbiddenError'
 
+  /personal/users/{userId}/following/users:
+    get:
+      description: get the user profiles of then ones the `userId` is following
+      operationId: get-follewed-users
+      tags:
+        - user-following
+      parameters:
+        - $ref: '#/components/parameters/userIdPathParam'
+      responses:
+        200:
+          description: OK
+          $ref: '#/components/responses/UserDataProfilesResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        403:
+          $ref: '#/components/responses/ForbiddenError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
+  /personal/users/{userId}/followers:
+    get:
+      description: get the user profiles of `userId`'s followers
+      operationId: get-followers
+      tags:
+        - user-following
+      parameters:
+        - $ref: '#/components/parameters/userIdPathParam'
+      responses:
+        200:
+          description: OK
+          $ref: '#/components/responses/UserDataProfilesResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        403:
+          $ref: '#/components/responses/ForbiddenError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+
   /personal/users/{userId}/following/users/{followedUserId}:
     description: Adds `followedUserId` to the `following` list of `userId`, and `userId` to `followers` list of `followedUserId`
     patch:
       operationId: add-user-to-following
       tags:
-        - user-data
+        - user-following
       parameters:
         - $ref: '#/components/parameters/userIdPathParam'
         - $ref: '#/components/parameters/followedUserIdPathParam'
@@ -629,7 +667,7 @@ paths:
     patch:
       operationId: remove-user-from-following
       tags:
-        - user-data
+        - user-following
       parameters:
         - $ref: '#/components/parameters/userIdPathParam'
         - $ref: '#/components/parameters/followedUserIdPathParam'
@@ -775,6 +813,15 @@ components:
             type: string
         following:
           $ref: '#/components/schemas/Following'
+
+    UserDataProfile:
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+        profile:
+          $ref: '#/components/schemas/UserProfile'
 
     TagCount:
       type: object
@@ -938,6 +985,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/User'
+    UserDataProfilesResponse:
+      description: List of user profiles
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserDataProfile'
     ForbiddenError:
       description: Access token is missing or invalid
     UnauthorizedError:
