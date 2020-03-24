@@ -36,6 +36,7 @@ const userSchema = new Schema({
     readLater: [String],
     likes: [String], //ids of bookmarks liked by user
     watchedTags: [String],
+    ignoredTags: [String],
     pinned: [String],
     favorites: [String],
     history: [String],

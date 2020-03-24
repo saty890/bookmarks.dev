@@ -488,6 +488,7 @@ describe('Personal Bookmarks tests', function () {
         readLater: [],
         likes: [],
         watchedTags: [],
+        ignoredTags: [],
         pinned: [],
         favorites: [],
         history: [],

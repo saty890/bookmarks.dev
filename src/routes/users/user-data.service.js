@@ -17,6 +17,7 @@ let createUserData = async function (userData, userId) {
     readLater: userData.readLater,
     likes: userData.likes,
     watchedTags: userData.watchedTags,
+    ignoredTags: userData.ignoredTags,
     pinned: userData.pinned,
     favorites: userData.favorites,
     history: userData.history
