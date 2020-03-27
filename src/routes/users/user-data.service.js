@@ -136,38 +136,6 @@ let getLikedBookmarks = async function (userId) {
   }
 }
 
-let getWatchedTags = async function (userId, page, limit) {
-  const userData = await User.findOne({
-    userId: userId
-  });
-  if ( !userData ) {
-    throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
-  } else {
-    const bookmarks = await Bookmark.find({
-      public: true,
-      $and: [
-        {
-          tags: {
-            $elemMatch: {$in: userData.watchedTags}
-          }
-        },
-        {
-          tags: {
-            $not: {$elemMatch: {$in: userData.ignoredTags}}
-          }
-        }
-      ]
-    })
-      .sort({createdAt: -1})
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean()
-      .exec();
-
-    return bookmarks;
-  }
-}
-
 let getUsedTagsForPublicBookmarks = async function (userId) {
 
   const aggregatedTags = await Bookmark.aggregate([
@@ -534,7 +502,6 @@ module.exports = {
   deleteUserData: deleteUserData,
   getReadLater: getReadLater,
   getLikedBookmarks: getLikedBookmarks,
-  getWatchedTags: getWatchedTags,
   getUsedTagsForPublicBookmarks: getUsedTagsForPublicBookmarks,
   getUsedTagsForPrivateBookmarks: getUsedTagsForPrivateBookmarks,
   getPinnedBookmarks: getPinnedBookmarks,

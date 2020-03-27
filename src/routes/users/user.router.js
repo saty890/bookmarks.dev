@@ -85,15 +85,6 @@ usersRouter.get('/:userId/likes', keycloak.protect(), async (request, response) 
   response.send(likedBookmarks);
 });
 
-/* GET list of bookmarks for the user's watchedTags */
-usersRouter.get('/:userId/watched-tags', keycloak.protect(), async (request, response) => {
-  userIdTokenValidator.validateUserId(request);
-  const {page, limit} = PaginationQueryParamsHelper.getPageAndLimit(request);
-  const bookmarks = await UserDataService.getWatchedTags(request.params.userId, page, limit);
-
-  response.send(bookmarks);
-});
-
 
 /* GET list of bookmarks for the user's feed */
 usersRouter.get('/:userId/feed', keycloak.protect(), async (request, response) => {
@@ -103,7 +94,6 @@ usersRouter.get('/:userId/feed', keycloak.protect(), async (request, response) =
 
   response.send(bookmarks);
 });
-
 
 
 /* GET list of used tag for the user */
