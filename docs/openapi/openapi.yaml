@@ -585,6 +585,28 @@ paths:
         403:
           $ref: '#/components/responses/ForbiddenError'
 
+  /personal/users/{userId}/feed:
+    description: |
+      Returns bookmarks to be displayed on user feed (landing page)
+      `page` and `limit` query parameters are used for pagination - if missing default values are used.
+    get:
+      description: Reads user data
+      operationId: get-user-feed-bookmarks
+      tags:
+        - user-data
+      parameters:
+        - $ref: '#/components/parameters/userIdPathParam'
+        - $ref: "#/components/parameters/pageQueryParam"
+        - $ref: "#/components/parameters/limitQueryParam"
+      responses:
+        200:
+          description: OK
+          $ref: '#/components/responses/BookmarkListResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        403:
+          $ref: '#/components/responses/ForbiddenError'
+
   /personal/users/{userId}/read-later:
     description: |
       Returns bookmarks the user added to **Read later**

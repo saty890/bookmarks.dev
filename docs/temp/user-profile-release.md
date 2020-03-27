@@ -1,8 +1,16 @@
+## Backup - DONE
+- Mongo 
+
 ## Set `displayName`
 
-### Add **KEYCLOAK_REALM_ADMIN** role to realm
+## Keycloak setup
+
+### Add **KEYCLOAK_REALM_ADMIN** role to realm - DONE
 You will need this role to execute the following API calls
-_
+
+### Create service account to get KEYCLOAK_REALM_ADMIN role - DONE
+Client - `keycloak-realm-admin-service-account`
+
 ### Set display name for `user` via admin api call
 Get Access Token and Call admin api
 ```
@@ -19,5 +27,8 @@ Get Access Token and Call admin api
 PUT https://www.bookmarks.dev/api/admin/users/profile/image-url
 ```
 
-### set AWS env variables in pm2 for prod
+### set AWS env variables in pm2 for prod - DONE
 
+
+## Testing
+New user, then delete with service account

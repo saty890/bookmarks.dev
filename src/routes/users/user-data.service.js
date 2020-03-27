@@ -145,7 +145,18 @@ let getWatchedTags = async function (userId, page, limit) {
   } else {
     const bookmarks = await Bookmark.find({
       public: true,
-      tags: {$elemMatch: {$in: userData.watchedTags}}
+      $and: [
+        {
+          tags: {
+            $elemMatch: {$in: userData.watchedTags}
+          }
+        },
+        {
+          tags: {
+            $not: {$elemMatch: {$in: userData.ignoredTags}}
+          }
+        }
+      ]
     })
       .sort({createdAt: -1})
       .skip((page - 1) * limit)
@@ -439,6 +450,83 @@ let getFollowers = async function (userId) {
   }
 }
 
+/**
+ * Highly unlikely case if the user is following popular tags
+ * It returns bookmarks tagged with user's watched tags and if end is reached
+ * the recent public bookmarks except ignored.
+ *
+ * @param userId
+ * @param page
+ * @param limit
+ * @returns {Promise<void>}
+ */
+
+let getFeedBookmarks = async function (userId, page, limit) {
+  const userData = await User.findOne({
+    userId: userId
+  });
+  if ( !userData ) {
+    throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
+  } else {
+
+    const filterFeedBookmarks = {
+      public: true,
+      $and: [
+        {
+          tags: {
+            $elemMatch: {$in: userData.watchedTags}
+          }
+        },
+        {
+          tags: {
+            $not: {$elemMatch: {$in: userData.ignoredTags}}
+          }
+        }
+      ]
+    };
+    let bookmarks = await Bookmark.find(filterFeedBookmarks)
+      .sort({createdAt: -1})
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean()
+      .exec();
+
+
+    if ( bookmarks.length < limit ) {
+      const count = await Bookmark.countDocuments(filterFeedBookmarks);
+
+      const intervalRight = page * limit;
+      const pageOtherPublicBookmarks = Math.floor((intervalRight - count) / limit );
+      const limitOtherPublicBookmarks = intervalRight - count < limit ? intervalRight - count : limit;
+
+      const otherPublicBookmarks = await Bookmark.find({
+        public: true,
+        $and: [
+          {
+            tags: {
+              $not: {$elemMatch: {$in: userData.watchedTags}}
+            }
+          },
+          {
+            tags: {
+              $not: {$elemMatch: {$in: userData.ignoredTags}}
+            }
+          }
+        ]
+      })
+        .sort({createdAt: -1})
+        .skip(pageOtherPublicBookmarks * limit)
+        .limit(limitOtherPublicBookmarks)
+        .lean()
+        .exec();
+
+      bookmarks = bookmarks.concat(otherPublicBookmarks);
+    }
+
+    return bookmarks;
+  }
+}
+
 module.exports = {
   updateUserData: updateUserData,
   createUserData: createUserData,
@@ -456,5 +544,6 @@ module.exports = {
   followUser: followUser,
   unfollowUser: unfollowUser,
   getFollowedUsersData: getFollowedUsersData,
-  getFollowers: getFollowers
+  getFollowers: getFollowers,
+  getFeedBookmarks: getFeedBookmarks
 }
