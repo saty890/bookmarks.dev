@@ -55,7 +55,7 @@ personalBookmarksRouter.get('/', keycloak.protect(), async (request, response, n
 /* GET bookmark of user by location*/
 personalBookmarksRouter.get('/', keycloak.protect(), async (request, response, next) => {
   if ( request.query.location ) {
-    const bookmark = await PersonalBookmarksService.getBookmarkByLocation(request.params.userId, request.query.location);
+    const bookmark = await PersonalBookmarksService.getPersonalBookmarkByLocation(request.params.userId, request.query.location);
     return response.send(bookmark);
   } else {
     next();

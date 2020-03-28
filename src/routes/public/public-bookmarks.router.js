@@ -27,7 +27,7 @@ router.get('/', async (request, response, next) => {
 router.get('/', async (request, response, next) => {
   const location = request.query.location;
   if (location) {
-    const bookmarksForLocation = await PublicBookmarksService.getBookmarkByLocation(location);
+    const bookmarksForLocation = await PublicBookmarksService.getPublicBookmarkByLocation(location);
 
     return response.send(bookmarksForLocation);
   } else {

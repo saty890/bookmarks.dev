@@ -60,7 +60,7 @@ let getBookmarkById = async (userId, bookmarkId) => {
 };
 
 /* GET bookmark of user by location*/
-let getBookmarkByLocation = async (userId, location) => {
+let getPersonalBookmarkByLocation = async (userId, location) => {
 
   const bookmark = await Bookmark.findOne({
     userId: userId,
@@ -224,7 +224,7 @@ module.exports = {
   createBookmark: createBookmark,
   getSuggestedTagsForUser: getSuggestedTagsForUser,
   getBookmarkById: getBookmarkById,
-  getBookmarkByLocation: getBookmarkByLocation,
+  getPersonalBookmarkByLocation: getPersonalBookmarkByLocation,
   getLastAccessedBookmarks: getLastAccessedBookmarks,
   getLastCreatedBookmarks: getLastCreatedBookmarks,
   getMostUsedBookmarks: getMostUsedBookmarks,
