@@ -30,5 +30,8 @@ PUT https://www.bookmarks.dev/api/admin/users/profile/image-url
 ### set AWS env variables in pm2 for prod - DONE
 
 
+### Clone bookmarks found in favorites to users personal
+Execute script - 1585427412659_change-favorites-to-copy-to-mine.js
+
 ## Testing
 New user, then delete with service account
