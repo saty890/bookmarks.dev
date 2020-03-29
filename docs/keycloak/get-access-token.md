@@ -34,7 +34,7 @@ curl  \
 ```bash
 curl  \
   -d 'client_id=keycloak-realm-admin-service-account' \
-  -d 'client_secret=658c4ebc-cf2b-41af-aa9a-065aa1652fac' \
+  -d 'client_secret=CHANGE-ME' \
   -d 'grant_type=client_credentials' \
   'https://www.bookmarks.dev/auth/realms/bookmarks/protocol/openid-connect/token' \
 | jq -r '.access_token'
