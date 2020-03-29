@@ -119,7 +119,12 @@ usersRouter.get('/:userId/pinned', keycloak.protect(), async (request, response)
   response.send(pinnedBookmarks);
 });
 
-/* GET list of user's favorite bookmarks */
+/*
+/**
+ * Deprecated - might get reactivated if community decides for it
+ *
+ * GET list of user's favorite bookmarks
+ */
 usersRouter.get('/:userId/favorites', keycloak.protect(), async (request, response) => {
   userIdTokenValidator.validateUserId(request);
   const {page, limit} = PaginationQueryParamsHelper.getPageAndLimit(request);

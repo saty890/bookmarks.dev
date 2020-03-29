@@ -241,6 +241,10 @@ let getPinnedBookmarks = async function (userId, page, limit) {
   }
 }
 
+/**
+ * Deprecated - might get reactivated if community decides for it
+ *
+ */
 let getFavoriteBookmarks = async function (userId, page, limit) {
   const userData = await User.findOne({
     userId: userId

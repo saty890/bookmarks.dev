@@ -547,6 +547,7 @@ paths:
       `page` and `limit` query parameters are used for pagination - if missing default values are used.
     get:
       description: Reads user data
+      deprecated: true
       operationId: get-user-data-favorites
       tags:
         - user-data
@@ -800,6 +801,7 @@ components:
           items:
             type: string
         favorites:
+          deprecated: true
           type: array
           items:
             type: string

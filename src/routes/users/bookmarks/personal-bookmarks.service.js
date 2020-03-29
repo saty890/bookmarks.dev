@@ -170,8 +170,7 @@ let deleteBookmarkById = async (userId, bookmarkId) => {
           readLater: bookmarkId,
           likes: bookmarkId,
           pinned: bookmarkId,
-          history: bookmarkId,
-          favorites: bookmarkId
+          history: bookmarkId
         }
       },
       {multi: true}
