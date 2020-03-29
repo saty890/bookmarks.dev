@@ -209,7 +209,7 @@ let setProfileImageUrlForUsersWithGravatar = async (keycloakUsers) => {
       {
         $and: [
           {userId: keycloakUser.id},
-          //{ "profile.imageUrl": { "$exists": false } },
+          { "profile.imageUrl": { "$exists": false } },
         ]
       },
       {"$set": {"profile.imageUrl": imageUrl}},
