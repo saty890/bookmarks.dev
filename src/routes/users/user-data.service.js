@@ -5,6 +5,7 @@ const Bookmark = require('../../model/bookmark');
 
 const ValidationError = require('../../error/validation.error');
 const NotFoundError = require('../../error/not-found.error');
+const PublicBookmarksService = require('../public/public-bookmarks.service');
 
 let createUserData = async function (userData, userId) {
 
@@ -438,7 +439,8 @@ let getFeedBookmarks = async function (userId, page, limit) {
     userId: userId
   });
   if ( !userData ) {
-    throw new NotFoundError(`User data NOT_FOUND for userId: ${userId}`);
+    // falls back to getting the public bookmarks - the case happens when the user register for the first time via Keycloak
+    return PublicBookmarksService.getLatestPublicBookmarks(page, limit);
   } else {
 
     const filterFeedBookmarks = {

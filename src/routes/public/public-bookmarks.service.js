@@ -15,7 +15,7 @@ let getPublicBookmarkByLocation = async (location) => {
   }
 }
 
-let getLatestBookmarks = async (page, limit) => {
+let getLatestPublicBookmarks = async (page, limit) => {
 
   const bookmarks = await Bookmark.find({'public': true})
     .sort({createdAt: -1})
@@ -63,7 +63,7 @@ let getBookmarkById = async function (bookmarkId) {
 
 module.exports = {
   getPublicBookmarkByLocation: getPublicBookmarkByLocation,
-  getLatestPublicBookmarks: getLatestBookmarks,
+  getLatestPublicBookmarks: getLatestPublicBookmarks,
   getBookmarksForTag: getBookmarksForTag,
   getBookmarkById: getBookmarkById
 };
